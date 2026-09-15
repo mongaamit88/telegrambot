@@ -3,6 +3,7 @@ import asyncio
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 from flask import Flask
+import threading
 
 # 1. Flask सर्वर ताकि Render का पोर्ट वाला चक्कर खत्म हो जाए
 app = Flask('')
@@ -32,10 +33,9 @@ async def main():
 
 if __name__ == '__main__':
     # Flask को बैकग्राउंड में चलाना
-    import threading
     t = threading.Thread(target=run_flask)
     t.start()
     
     # Telegram Client को चलाना
-    with client:
-        client.loop.run_until_complete(main()
+    client.start()
+    client.loop.run_until_complete(main())
