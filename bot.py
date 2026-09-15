@@ -8,7 +8,7 @@ BOT_TOKEN = '8260517674:AAFbQxxpDuYv4bY_BXv-QnxQuvEJ9Wn7BZY'
 SOURCE_CHANNEL_ID = -1003978465701
 TARGET_CHANNEL = '@Black_Panther55'
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 @app.route('/')
 def home():
