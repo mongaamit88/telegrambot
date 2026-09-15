@@ -5,7 +5,6 @@ import threading
 import time
 
 BOT_TOKEN = '8260517674:AAFbQxxpDuYv4bY_BXv-QnxQuvEJ9Wn7BZY'
-SOURCE_CHANNEL_ID = -1003978465701
 TARGET_CHANNEL = '@Black_Panther55'
 
 app = Flask(__name__)
@@ -34,17 +33,13 @@ def forward_loop():
                     
                     message = result.get("channel_post") or result.get("message")
                     if message:
-                        chat_id = message.get("chat", {}).get("id")
+                        text = message.get("text", "")
                         
-                        # चेक करें कि मैसेज सही सोर्स चैनल से आया है या नहीं
-                        if chat_id == SOURCE_CHANNEL_ID or str(chat_id) == str(SOURCE_CHANNEL_ID):
-                            text = message.get("text", "")
-                            
-                            # टारगेट चैनल पर मैसेज भेजें
+                        if text:
                             send_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
                             payload = {
                                 "chat_id": TARGET_CHANNEL,
-                                "text": text if text else "নতুন मीडिया संदेश (Media Message)"
+                                "text": text
                             }
                             requests.post(send_url, json=payload)
                             print("संदेश सफलतापूर्वक फॉरवर्ड कर दिया गया!")
