@@ -1,17 +1,16 @@
-from telethon import TelegramClient, events
+import os
 from flask import Flask
 import threading
-import os
+from telethon import TelegramClient, events
 
-# आपकी टेलीग्राम डिटेल्स
 api_id = 15495534
 api_hash = 'c25019764e04eced107942a9f359a485'
+BOT_TOKEN = '8260517674:AAFbQxxpDuYv4bY_BXv-QnxQuvEJ9Wn7BZY'
 
 SOURCE_CHANNEL = -1003978465701
 TARGET_CHANNEL = '@Black_Panther55'
 
-# Render के लिए क्लाइंट सेटअप (बिना इंटरैक्टिव प्रॉम्प्ट के)
-client = TelegramClient('session_name', api_id, api_hash)
+client = TelegramClient('bot_session', api_id, api_hash).start(bot_token=BOT_TOKEN)
 
 @client.on(events.NewMessage(chats=SOURCE_CHANNEL))
 async def forward_message(event):
@@ -21,14 +20,6 @@ async def forward_message(event):
     except Exception as e:
         print(f"एरर आ गया: {e}")
 
-def main():
-    print("बॉट लाइव है...")
-    # नॉन-इंटरैक्टिव मोड में स्टार्ट करने के लिए
-    client.start()
-    print("नए मैसेज का इंतजार किया जा रहा है...")
-    client.run_until_disconnected()
-
-# Render के लिए वेब सर्वर
 app = Flask(__name__)
 
 @app.route('/')
@@ -36,7 +27,13 @@ def home():
     return "Telegram Bot is running smoothly!"
 
 def run_web():
-    app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def main():
+    print("बॉट लाइव है...")
+    print("नए मैसेज का इंतजार किया जा रहा है...")
+    client.run_until_disconnected()
 
 if __name__ == '__main__':
     threading.Thread(target=run_web).start()
