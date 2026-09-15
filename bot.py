@@ -1,53 +1,27 @@
 import os
-import requests
-from flask import Flask
-import threading
-import time
+from telethon import TelegramClient, events
 
-BOT_TOKEN = '8260517674:AAFbQxxpDuYv4bY_BXv-QnxQuvEJ9Wn7BZY'
+# आपकी दी गई डिटेल्स
+API_ID = 35065334
+API_HASH = 'c250107a46a4aced107942a9f350af85'
+
+# सोर्स ग्रुप और टारगेट चैनल
+SOURCE_CHAT_ID = -1003978465701
 TARGET_CHANNEL = '@Black_Panther55'
 
-app = Flask(__name__)
+# क्लाइंट सेटअप
+client = TelegramClient('session_name', API_ID, API_HASH)
 
-@app.route('/')
-def home():
-    return "Telegram Bot is running smoothly!"
-
-def run_web():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
-
-def forward_loop():
-    print("बॉट शुरू हो गया है और मैसेज चेक कर रहा है...")
-    last_update_id = 0
-    
-    while True:
-        try:
-            url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates?offset={last_update_id + 1}&timeout=30"
-            response = requests.get(url, timeout=35)
-            data = response.json()
-            
-            if data.get("ok"):
-                for result in data.get("result", []):
-                    last_update_id = result["update_id"]
-                    
-                    message = result.get("channel_post") or result.get("message")
-                    if message:
-                        text = message.get("text", "")
-                        
-                        if text:
-                            send_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-                            payload = {
-                                "chat_id": TARGET_CHANNEL,
-                                "text": text
-                            }
-                            requests.post(send_url, json=payload)
-                            print("संदेश सफलतापूर्वक फॉरवर्ड कर दिया गया!")
-                            
-        except Exception as e:
-            print(f"एरर: {e}")
-            time.sleep(5)
+@client.on(events.NewMessage(chats=SOURCE_CHAT_ID))
+async def forward_message(event):
+    try:
+        # मैसेज को सीधे टारगेट चैनल पर फॉरवर्ड करना
+        await client.forward_messages(TARGET_CHANNEL, event.message)
+        print("मैसेज सफलतापूर्वक फॉरवर्ड हो गया!")
+    except Exception as e:
+        print(f"एरर: {e}")
 
 if __name__ == '__main__':
-    threading.Thread(target=run_web).start()
-    forward_loop()
+    print("यूजरबोट शुरू हो रहा है...")
+    client.start()
+    client.run_until_disconnected()
