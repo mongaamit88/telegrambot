@@ -29,7 +29,7 @@ def main():
     client.run_until_disconnected()
 
 # Render के लिए वेब सर्वर
-app = Flask(_name_)
+app = Flask(__name__)
 
 @app.route('/')
 def home():
